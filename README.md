@@ -1,94 +1,119 @@
 # Project Synapse
 
-**Project Synapse is my cybersecurity graduation project.**
+**AI-Driven Hybrid SOC Platform — from enterprise vision to proof-of-concept implementation**
 
-It explores how an open-source security stack can be combined with data analytics in a modular engineering architecture that can grow from a constrained prototype into a larger distributed deployment.
+Graduation project by **Mu'ath Yousef**, Tafila Technical University, 2025–2026.
 
-Project Synapse is **not SOCRoot** and it is not evaluated as a subscription business. Its success criteria are technical and academic: clear architecture, correct integration, reproducible evidence, explainable analysis, measured constraints, and a documented path to scale.
+Project Synapse is an open-source cybersecurity and security-data-engineering project. It combines rule-based detection with stream analytics in a modular architecture that can be evaluated on one constrained node and scaled by design into a distributed deployment.
 
-## Engineering objective
+Project Synapse is **not SOCRoot**. Synapse is assessed by technical and academic evidence; [SOCRoot](https://socroot.com) is a separate commercial initiative assessed by customer value, willingness to pay, and renewal.
 
-Build and document a hybrid SOC architecture that:
+## At a glance
 
-- uses reviewable, self-hostable, open-source components where practical;
-- combines rule-based detection with data analysis and, where justified, statistical or ML techniques;
-- makes the path from ingestion to storage, enrichment, detection, case handling, response, and evidence explicit;
-- separates components through documented contracts so they can be replaced or scaled independently;
-- supports a small single-node proof of concept and explains how the same boundaries can scale horizontally;
-- records operational evidence, limitations, failure modes, and rollback behavior.
+| Track | Purpose | Current evidence boundary |
+|---|---|---|
+| **Enterprise Synapse** | Distributed hybrid SOC architecture using Wazuh, Kafka, Spark, OpenSearch, and modular SOAR/observability layers | Architecture and capacity model; not a deployed 90-node production system |
+| **PSM** | Single-node proof of concept validating Kafka → Spark → OpenSearch streaming detection | Results are recorded in the current academic report; public reproducibility package is still being assembled |
+| **Synapse Arm / CLI** | Controlled CVE lab workflow: initialize, exploit, patch, verify, preserve evidence, and report | Graduation-development plan; commands and end-to-end evidence must be verified before they are presented as implemented |
 
-## Architectural principles
+## The engineering problem
 
-1. **Open-source first** — favor components that can be inspected, documented, and self-hosted.
-2. **Hybrid analytics** — combine rules, enrichment, data analysis, and ML only where data and evidence support them.
-3. **Modularity** — separate ingestion, storage, analytics, detection, case management, and response.
-4. **Scalability** — design a clear path from Synapse Mini to a distributed deployment.
-5. **Observability** — measure data flow, latency, errors, resource use, and component health.
-6. **Governance and safety** — keep permissions, evidence, approval boundaries, and rollback explicit.
+Commercial SIEM platforms offer mature capabilities but can impose high recurring cost, vendor lock-in, opaque analytics, and limits on data residency or customization. Project Synapse investigates a different model:
 
-## Documented component set
+- treat security operations as a distributed data pipeline;
+- move from **collect → store → search** toward **stream → detect → store**;
+- combine explainable rules with stateful behavioral analysis;
+- keep detection logic, infrastructure knowledge, and evidence reviewable;
+- validate the design on constrained infrastructure before claiming enterprise scale.
 
-The current material discusses components such as:
+## Core architecture
 
-- Wazuh for SIEM/XDR telemetry and rule-based detection;
-- Kafka or equivalent messaging for decoupled data flow;
-- OpenSearch for indexing, search, and dashboards;
-- Spark/ML or other data-analysis paths where justified;
-- TheHive/Cortex for case management and enrichment;
-- Docker for reproducible deployment;
-- Prometheus, Grafana, OpenTelemetry, and Jaeger for observability.
+```mermaid
+flowchart LR
+    A["Authorized / synthetic telemetry"] --> B["Wazuh or controlled injection"]
+    B --> C["Kafka: raw-events"]
+    C --> D["Rule-based detection"]
+    C --> E["Spark stateful analytics"]
+    D --> F["Kafka: alerts"]
+    E --> F
+    F --> G["Logstash / normalization"]
+    G --> H["OpenSearch evidence and search"]
+    H --> I["Dashboards and analyst review"]
+    F -. future integration .-> J["TheHive / Cortex / SOAR"]
+    I --> K["Human decision and auditable outcome"]
+```
 
-A component appearing in a diagram does not prove that every integration works end to end. Operational claims require a reproducible test and retained evidence.
+The enterprise design separates data collection, streaming, detection, storage, SOAR, and observability. The PSM proof of concept intentionally removes replication, high availability, and geographic distribution to test the core pipeline on one node.
 
-## Repository role
+## PSM evidence snapshot
 
-This repository is the public source for the graduation project's scope, architecture, maturity, and evidence gates.
+The current academic deliverable reports the following controlled results:
+
+| Measure | Reported result | Interpretation |
+|---|---:|---|
+| Sustained throughput | 967 events/second | 60,000 events processed in 62 seconds |
+| Peak throughput | 1,200 events/second | five-second burst |
+| Average end-to-end latency | 15.96 seconds | PSM micro-batch pipeline |
+| P95 / P99 latency | 17.8 / 18.2 seconds | within the POC acceptance limits |
+| Privilege-escalation precision | 95.9% | 47 true positives, 2 false positives |
+| Recall / F1 | 94.0% / 94.9% | based on 100 labeled cases |
+| Seven-day simulation | 2,847,391 events | 1,247 alerts; 99.7% reported uptime |
+
+These figures are **report-backed, not yet independently reproduced from this public repository**. The enterprise target of 50,000–200,000 events/second is a design and capacity-planning target, not a deployed result. See the [evidence register](docs/evidence-register.md).
+
+## Controlled CVE workflow
+
+The graduation-development plan defines a separate lab workflow:
+
+```text
+init CVE → exploit in an isolated lab → detect → apply patch/mitigation
+         → verify the exploit no longer succeeds → preserve evidence → report
+```
+
+This workflow is authorized-lab work only. Its maturity is tracked independently from the PSM streaming benchmark.
+
+## Open-source component model
+
+- **Wazuh and Sigma** — explainable rule-based detection;
+- **Kafka** — durable, replayable event transport;
+- **Spark Structured Streaming** — stateful behavioral detection and data analysis;
+- **OpenSearch** — alert/evidence indexing, search, and dashboards;
+- **TheHive/Cortex or a reviewed alternative** — case management and enrichment;
+- **Prometheus, Grafana, OpenTelemetry, and Jaeger** — observability;
+- **Docker Compose** for POC reproducibility, with a documented path toward Kubernetes.
+
+A component appearing here or in a diagram does not prove that its end-to-end integration is complete.
+
+## Repository map
 
 | Concern | Canonical location |
 |---|---|
-| Public architecture, data flow, decisions, and roadmap | This repository |
-| Runtime/POC for ingestion, triage, HITL, and evidence capture | `Project-Synapse-SOC-Factory` — private during Git-history review |
-| Commercial cybersecurity service direction | [SOCRoot](https://socroot.com) — a separate project |
-| SOCRoot public website | [kyriesoc](https://github.com/Muath-Yousef/kyriesoc) |
-
-## Graduation-project completion criteria
-
-- an updated architecture diagram with explicit boundaries and contracts;
-- a component inventory with role, rationale, and alternatives;
-- a documented data path from ingestion through analysis, detection, and case handling;
-- at least one end-to-end integration test with an input, expected output, and acceptance criteria;
-- baseline measurements for latency, data volume, resource consumption, and failures;
-- a documented path from a constrained POC to a distributed deployment;
-- a delivery package covering setup, verification, limitations, and rollback.
+| Public scope, architecture, analytics method, roadmap, and evidence register | This repository |
+| Runtime/POC implementation | `Project-Synapse-SOC-Factory` — private during history and release-safety review |
+| Reusable authorized utilities | `security-tools` — private and independent |
+| Commercial cybersecurity services | [SOCRoot](https://socroot.com) — separate project |
 
 ## Safety invariants
 
 1. `SOAR_DRY_RUN=true` by default.
-2. Sensitive actions require human approval.
+2. Sensitive actions require explicit human approval.
 3. CDN and RFC1918 addresses are never automatically blocked.
-4. DNS events produce `NOTIFY_ONLY`, never `BLOCK_IP`.
-5. Raw client data is never sent to external AI providers.
-6. Every action must produce traceable evidence and support rollback.
+4. DNS-derived events remain `NOTIFY_ONLY`, never `BLOCK_IP`.
+5. Raw operational data is not sent to external AI providers.
+6. Controlled exploitation runs only in isolated, authorized labs.
+7. Every approved action or experiment retains traceable evidence and rollback context.
 
 ## Maturity
 
-**Status: active graduation-project architecture and prototype validation.**
+**Active graduation-project documentation and prototype validation.**
 
-The project does not claim full end-to-end production readiness, a proven SLA, autonomous remediation, sovereign or national-grade capability, or performance figures that are not backed by reviewable tests.
-
-## Relationship with SOCRoot
-
-[SOCRoot](https://socroot.com) is a separate commercial innovation focused on subscription-based, automatable cybersecurity services with measurable customer value.
-
-Project Synapse and SOCRoot may reuse patterns or components, but:
-
-- technical evidence from Project Synapse does not prove that a customer will pay for SOCRoot;
-- a SOCRoot subscription does not by itself validate the Project Synapse academic deliverable;
-- shared code does not merge their scope, ownership, or success criteria.
+The project does not claim a production deployment, guaranteed SLA, unattended remediation, certification, or independently reproduced enterprise-scale performance. Results, targets, projections, and future work are labeled separately.
 
 ## Documentation
 
 - [Overview](docs/overview.md)
 - [Architecture](docs/architecture.md)
-- [Data analytics method](docs/data-analytics.md)
+- [Data analytics and evaluation](docs/data-analytics.md)
+- [Evidence register](docs/evidence-register.md)
 - [Roadmap](docs/roadmap.md)
+- [Security policy](SECURITY.md)
