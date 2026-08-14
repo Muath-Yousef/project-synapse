@@ -15,8 +15,8 @@ This repository contains **architecture and documentation**, not the canonical r
 | Concern | Canonical repository |
 |---|---|
 | Public architecture and roadmap | This repository |
-| Control plane, portals, RBAC, and evidence workflows | [ide-agentic-engine](https://github.com/Muath-Yousef/ide-agentic-engine) |
-| Alert ingestion, triage, orchestration, and runtime actions | [Project-Synapse-SOC-Factory](https://github.com/Muath-Yousef/Project-Synapse-SOC-Factory) |
+| Control plane, portals, RBAC, and evidence workflows | `ide-agentic-engine` — private during Git-history security review |
+| Alert ingestion, triage, orchestration, and runtime actions | `Project-Synapse-SOC-Factory` — private during Git-history security review |
 | Product website | [kyriesoc](https://github.com/Muath-Yousef/kyriesoc) |
 
 ## Architectural scope
