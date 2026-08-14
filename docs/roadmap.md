@@ -2,110 +2,101 @@
 
 ## Objective
 
-This roadmap moves Project Synapse from architecture documentation to a defensible graduation-project demonstration. Progress is controlled by evidence gates rather than dates or broad capability claims.
+Convert the source-backed academic work into a publicly reproducible, safely documented graduation-project artifact. Progress is governed by evidence states, not dates.
 
-## Maturity vocabulary
+## Evidence states
 
 | State | Meaning |
 |---|---|
-| Designed | responsibility and interface are documented |
-| Implemented | code or configuration exists |
+| Source-backed | stated in the White Paper, academic report, or development plan |
+| Implemented | code/configuration exists in the reviewed tree |
 | Integrated | components exchange expected data in a controlled test |
-| Measured | latency, resource use, errors, or analysis quality are recorded |
-| Validated | acceptance criteria pass repeatedly with retained evidence |
-| Production-ready | outside the current claim boundary unless separately proven |
+| Measured | results and method are retained |
+| Publicly reproducible | a reviewer can rerun the result from sanitized artifacts |
+| Production-validated | outside the current claim boundary unless separately proven |
 
-## Phase 1 — identity and scope baseline
-
-**Outcome:** the academic problem, project boundary, and success criteria are unambiguous.
+## Gate 1 — identity and source hierarchy
 
 - [x] define Project Synapse as the graduation project;
-- [x] separate Project Synapse from SOCRoot's commercial identity;
-- [x] publish safety and maturity boundaries;
-- [x] define the public/private repository map.
+- [x] separate it from SOCRoot;
+- [x] identify White Paper v2.0 as concept/architecture source;
+- [x] identify the 2025–2026 academic report as delivery/results source;
+- [x] preserve Google Drive as the original-file layer and GitHub as the sanitized public engineering layer.
 
-**Gate:** README and documentation agree on purpose, ownership, and claim limits.
+**Gate result:** complete.
 
-## Phase 2 — architecture and contracts
+## Gate 2 — public architecture baseline
 
-**Outcome:** a reviewer can trace the intended data and decision paths.
+- [x] document enterprise and PSM boundaries;
+- [x] publish the stream-detect-store path;
+- [x] document the controlled CVE lifecycle as a separate planned workflow;
+- [x] label enterprise scale as a target, not a result;
+- [ ] publish component/version inventory and interface schemas.
 
-- [x] document the logical architecture and scale-out stages;
-- [ ] publish the component/version inventory;
-- [ ] define the normalized event schema;
-- [ ] define finding, case, evidence, and approval contracts;
-- [ ] record component rationale and alternatives.
+**Gate result:** substantially complete; contracts remain.
 
-**Gate:** every integration edge has an owner, schema, failure behavior, and evidence requirement.
+## Gate 3 — PSM reproducibility package
 
-## Phase 3 — reproducible POC
+The academic report states that PSM is implemented and measured. GitHub must now make that evidence independently reviewable.
 
-**Outcome:** a new reviewer can run the constrained environment using synthetic data.
+- [ ] sanitized event generator and deterministic seed;
+- [ ] Docker Compose/environment specification;
+- [ ] pinned component versions;
+- [ ] detection rules and expected outputs;
+- [ ] benchmark command and raw result format;
+- [ ] confusion-matrix labels and calculation;
+- [ ] clean-environment reproduction guide.
 
-- [ ] document prerequisites and setup;
-- [ ] provide sanitized configuration examples;
-- [ ] generate deterministic synthetic telemetry;
-- [ ] validate ingestion, storage, search, and observability;
-- [ ] retain expected and actual outputs.
+**Gate:** reported results can be rerun without private data or hidden configuration.
 
-**Gate:** setup succeeds from a clean environment and produces the documented baseline.
+## Gate 4 — CVE lab workflow
 
-## Phase 4 — analytics evidence
+- [ ] select authorized, technically meaningful CVEs;
+- [ ] define an isolated lab template;
+- [ ] verify `synapse init`, `exploit`, `patch apply`, `verify`, `evidence`, and `report`;
+- [ ] capture pre-exploit baseline and post-patch retest;
+- [ ] produce tamper-evident evidence with hashes and timestamps;
+- [ ] document teardown and rollback.
 
-**Outcome:** at least one security analysis is reproducible and explainable.
+**Gate:** one CVE completes exploit → detect → patch → verify → evidence → report safely and reproducibly.
 
-- [ ] define dataset scope, fields, exclusions, and quality checks;
-- [ ] implement descriptive baseline analysis;
-- [ ] evaluate a rule, statistical method, or ML method against a documented baseline;
-- [ ] record false positives, false negatives, uncertainty, and limitations;
-- [ ] link every conclusion to a versioned artifact.
+## Gate 5 — expanded hybrid detection
 
-**Gate:** another reviewer can reproduce the result from the documented input and method.
+- [ ] add versioned rules for lateral movement, persistence, and credential access;
+- [ ] document false-positive and evasion cases;
+- [ ] build a labeled validation set;
+- [ ] compare against a simple baseline;
+- [ ] evaluate an explainable anomaly method only after data-quality checks;
+- [ ] add analyst feedback and drift monitoring.
 
-## Phase 5 — end-to-end security workflow
+**Gate:** broader coverage improves measured utility without hiding uncertainty.
 
-**Outcome:** one authorized synthetic alert moves through the complete controlled path.
+## Gate 6 — resilience and scale-out validation
 
-- [ ] ingest and correlate the alert;
-- [ ] generate a finding with evidence;
-- [ ] enrich and open or update a case;
-- [ ] require human approval for a sensitive action;
-- [ ] execute dry-run or an explicitly approved lab action;
-- [ ] retain audit, outcome, and rollback evidence;
-- [ ] pass protected-target and approval-bypass negative tests.
+- [ ] multi-node Kafka/OpenSearch/Spark test;
+- [ ] replay, duplicate, and idempotency tests;
+- [ ] connector-failure and back-pressure exercises;
+- [ ] backup, restore, and rollback;
+- [ ] resource and latency measurements by stage;
+- [ ] capacity model reconciled against new evidence.
 
-**Gate:** all acceptance criteria pass repeatedly without unsafe side effects.
+**Gate:** scale claims cite retained measurements rather than linear-scaling assumptions alone.
 
-## Phase 6 — scalability and resilience
+## Gate 7 — graduation and portfolio package
 
-**Outcome:** the project can explain, with measurements, what must change beyond the POC.
-
-- [ ] establish CPU, memory, storage, throughput, and latency baselines;
-- [ ] test burst handling, retry, idempotency, and back-pressure;
-- [ ] run connector-failure and recovery exercises;
-- [ ] test backup, restore, and rollback;
-- [ ] document bottlenecks and the distributed deployment plan.
-
-**Gate:** scale and reliability claims cite retained measurements and known constraints.
-
-## Phase 7 — graduation delivery package
-
-**Outcome:** the project is reviewable as an academic and engineering artifact.
-
-- [ ] architecture and data-flow diagrams;
-- [ ] component and decision inventory;
-- [ ] setup and verification guide;
-- [ ] analytics artifact and interpretation;
-- [ ] end-to-end demonstration evidence;
+- [ ] architecture and data-flow visuals;
+- [ ] concise recruiter-facing project summary;
+- [ ] technical setup and verification guide;
+- [ ] benchmark and analytics artifact;
+- [ ] CVE workflow evidence;
 - [ ] limitations, ethics, privacy, and responsible-use statement;
-- [ ] presentation narrative and demo fallback plan.
-
-**Gate:** every major claim maps to a document, test, measurement, or clearly labeled future-work item.
+- [ ] presentation narrative and demo fallback;
+- [ ] evidence index linking each major claim to its artifact.
 
 ## Immediate priorities
 
-1. publish the component/version inventory and event schema;
-2. define one deterministic synthetic end-to-end scenario;
-3. create the first reproducible data-analysis artifact;
-4. capture baseline performance and failure measurements;
-5. assemble an evidence index for the graduation review.
+1. publish the PSM reproducibility package;
+2. publish component versions and event/finding schemas;
+3. validate one controlled CVE workflow;
+4. create machine-readable benchmark output;
+5. add architecture and result figures with sanitized evidence.
