@@ -117,3 +117,7 @@ The project does not claim a production deployment, guaranteed SLA, unattended r
 - [Evidence register](docs/evidence-register.md)
 - [Roadmap](docs/roadmap.md)
 - [Security policy](SECURITY.md)
+
+## Reuse, citation, and contribution
+
+Project Synapse is licensed under [Apache License 2.0](LICENSE). See [CONTRIBUTING.md](CONTRIBUTING.md) for the safe contribution and evidence rules. Academic and engineering users can cite the project using [CITATION.cff](CITATION.cff).
