@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use Project Synapse in academic or engineering work, please cite this repository."
+title: "Project Synapse: AI-Driven Hybrid SOC Platform"
+type: software
+authors:
+  - family-names: "Yousef"
+    given-names: "Mu'ath"
+repository-code: "https://github.com/Muath-Yousef/project-synapse"
+url: "https://github.com/Muath-Yousef/project-synapse"
+abstract: >-
+  An open-source cybersecurity graduation project combining explainable
+  rule-based detection, stream analytics, a single-node PSM proof of concept,
+  and a scalable hybrid SOC architecture.
+keywords:
+  - cybersecurity
+  - security-data-engineering
+  - hybrid-soc
+  - kafka
+  - spark
+  - opensearch
+  - siem
+  - stream-processing
+license: Apache-2.0
