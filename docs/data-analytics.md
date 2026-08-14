@@ -1,104 +1,101 @@
-# Data Analytics Method
+# Data Analytics and Evaluation
 
 ## Purpose
 
-Data analytics is a core Project Synapse workstream, not a decorative dashboard layer. Each analysis must start with a clear security question and end with a reproducible result, uncertainty statement, and operational interpretation.
+Data analytics is a measured Project Synapse workstream. It covers both security-detection quality and pipeline performance. Each result must connect a defined input, method, metric, and limitation.
 
-## Candidate research questions
+## Current PSM evaluation
 
-Examples suitable for the graduation project include:
+### Detection logic
 
-- Which event sources contribute the most alert volume and noise?
-- How do rule severity and observed case priority differ?
-- Which repeated patterns indicate a candidate correlation or suppression rule?
-- How does ingestion-to-triage latency change with event volume?
-- Can a simple statistical or ML method improve prioritization over a documented rule-based baseline?
+The academic report evaluates two privilege-escalation patterns:
 
-The project should select a small number of questions that can be answered with available, authorized, and well-defined data.
+| Rule | Method | Expected behavior |
+|---|---|---|
+| `SUDO_SHELL_EXECUTION` | string/rule filtering for `sudo` plus shell execution | generate a HIGH alert |
+| `SUDO_ABUSE_SPIKE` | stateful aggregation over a time window | generate a CRITICAL spike alert |
 
-## Reproducible pipeline
+Documented negative testing included 100 benign SSH and file-operation entries with no sudo pattern; the report records zero alerts for that test.
 
-```mermaid
-flowchart LR
-    A["Authorized or synthetic source"] --> B["Schema validation"]
-    B --> C["Quality checks"]
-    C --> D["Versioned transformation"]
-    D --> E["Exploration / baseline"]
-    E --> F["Rule, statistic, or model"]
-    F --> G["Evaluation"]
-    G --> H["Security interpretation"]
-    H --> I["Evidence artifact and limitations"]
-```
+### Labeled-case metrics
+
+The report records a 100-case confusion matrix:
+
+| Outcome | Count |
+|---|---:|
+| True positives | 47 |
+| False positives | 2 |
+| False negatives | 3 |
+| True negatives | 48 |
+
+Derived results:
+
+- precision: **95.9%**;
+- recall: **94.0%**;
+- F1: **94.9%**;
+- accuracy: **95.0%**.
+
+Known false-positive contexts include legitimate administrator troubleshooting and configuration-management activity. Known false-negative examples include alternate shells, slow-paced attacks, and obfuscated commands. These limitations matter more than a single headline score.
+
+### Pipeline performance
+
+| Metric | Reported value |
+|---|---:|
+| 60,000-event sustained rate | 967 events/second |
+| five-second peak | 1,200 events/second |
+| consumer lag | 0 messages |
+| Spark CPU | 48% peak; 35% average |
+| OpenSearch indexing | 950 documents/second |
+| average latency | 15.96 seconds |
+| P95 latency | 17.8 seconds |
+| P99 latency | 18.2 seconds |
+| maximum latency | 19.4 seconds |
+
+The report also records a seven-day simulation of 2,847,391 events and 1,247 generated alerts. These are report-backed POC results; public raw fixtures, scripts, and machine-readable outputs are still required for independent reproduction.
+
+## Reproducibility contract
+
+A public benchmark package should include:
+
+1. sanitized generator and seed;
+2. event schema and exact count;
+3. hardware/VM specification;
+4. component images and versions;
+5. Kafka/Spark/OpenSearch configuration;
+6. detection-rule version;
+7. warm-up and measurement window;
+8. latency timestamp definition;
+9. confusion-matrix labeling procedure;
+10. raw result file and calculation notebook/query.
+
+Without these artifacts, the figures are useful academic evidence but not an independently verified public benchmark.
+
+## Enterprise targets are not measurements
+
+The enterprise documents discuss 50,000–200,000 events/second across a distributed design. That range is a capacity-planning target. It must not be combined with PSM's measured results or described as achieved.
+
+Likewise, projected operating cost and savings are model outputs dependent on endpoint count, ingestion, retention, infrastructure pricing, staffing, and comparison assumptions. They should be published with a reproducible cost model before being treated as validated economic results.
+
+## Future analytics path
+
+1. expand descriptive analysis across sources, severities, and latency;
+2. add 10–15 versioned rules for lateral movement, persistence, and credential access;
+3. establish reviewer-labeled datasets and inter-rater guidance;
+4. compare rules against a simple statistical baseline;
+5. evaluate Isolation Forest or another explainable anomaly baseline;
+6. add feedback, drift, and threshold monitoring only after labels are credible;
+7. keep human review responsible for findings and response.
 
 ## Minimum dataset contract
 
-Every analysis artifact should record:
+Every analysis records:
 
-- dataset name and version;
-- origin and authorization;
-- time window and sampling method;
-- field definitions and units;
-- inclusion, exclusion, and sanitization rules;
+- source, authorization, and version;
+- time window, sample, and exclusions;
+- field definitions and transformations;
 - missingness, duplicates, outliers, and label quality;
-- transformation code or query version;
-- retention and deletion expectations.
+- model/rule version and threshold;
+- result, uncertainty, and operational interpretation;
+- retention, sanitization, and deletion expectations.
 
-Do not publish raw client or production data. Public examples should use synthetic or sanitized fixtures with reserved domains and addresses.
-
-## Analysis progression
-
-### 1. Descriptive baseline
-
-Start with counts, rates, distributions, time patterns, source coverage, severity mix, and processing latency. This establishes whether the dataset is usable before introducing complex methods.
-
-### 2. Data-quality assessment
-
-Measure missing fields, invalid timestamps, duplicate events, schema drift, inconsistent labels, and source imbalance. A model result is not credible when its inputs are not understood.
-
-### 3. Rule and correlation evaluation
-
-Compare existing rules or correlations using documented metrics. Record what is treated as a true or false result and how uncertainty is reviewed.
-
-### 4. Statistical or ML evaluation
-
-Use ML only when it answers a defined question better than a simpler baseline. Keep the feature set, split strategy, leakage checks, hyperparameters, and evaluation code reviewable.
-
-## Evaluation metrics
-
-Metric choice depends on the question. Candidate measures include:
-
-| Objective | Candidate measures |
-|---|---|
-| Alert prioritization | precision, recall, F1, false-positive rate |
-| Ranking | precision@k, recall@k, mean reciprocal rank |
-| Anomaly review | reviewer-confirmed hit rate, alert volume reduction |
-| Pipeline performance | end-to-end latency, throughput, error rate, resource use |
-| Operational usefulness | time-to-triage, duplicate reduction, evidence completeness |
-
-Accuracy alone is rarely sufficient for imbalanced security data. Report the baseline, class distribution, threshold, and confidence interval or uncertainty where practical.
-
-## Evidence artifact template
-
-Each notebook, query, or report should contain:
-
-1. question and decision context;
-2. source and dataset contract;
-3. quality checks;
-4. method and baseline;
-5. result with appropriate visual or table;
-6. security interpretation;
-7. limitations and possible bias;
-8. reproducibility instructions;
-9. artifact version and evidence links.
-
-## AI and privacy boundary
-
-- do not send raw operational data to external AI providers;
-- minimize and sanitize any context used for assisted analysis;
-- label AI-generated hypotheses as unverified until tested;
-- retain the deterministic query, code, or rule that supports the conclusion;
-- keep a human responsible for findings and response decisions.
-
-## Completion gate
-
-The analytics workstream is complete for graduation review when at least one security question can be reproduced from a documented synthetic or authorized dataset, compared with a baseline, evaluated with suitable metrics, and explained with limitations and operational relevance.
+Raw client or production data is not a public portfolio artifact and is not sent to external AI providers.
