@@ -1,51 +1,111 @@
-# Roadmap
+# Project Synapse Roadmap
 
-## Roadmap objective
+## Objective
 
-This roadmap defines phased evolution for Project Synapse with emphasis on architectural discipline, operational grounding, and security-engineering integrity.
+This roadmap moves Project Synapse from architecture documentation to a defensible graduation-project demonstration. Progress is controlled by evidence gates rather than dates or broad capability claims.
 
-## Phase model
+## Maturity vocabulary
 
-### Phase 1 — Repository initialization
-- Establish initial repository presence.
-- Define baseline ownership and direction.
+| State | Meaning |
+|---|---|
+| Designed | responsibility and interface are documented |
+| Implemented | code or configuration exists |
+| Integrated | components exchange expected data in a controlled test |
+| Measured | latency, resource use, errors, or analysis quality are recorded |
+| Validated | acceptance criteria pass repeatedly with retained evidence |
+| Production-ready | outside the current claim boundary unless separately proven |
 
-### Phase 2 — Core structural baseline
-- Introduce early structure and direction artifacts.
-- Prepare for architecture-led consolidation.
+## Phase 1 — identity and scope baseline
 
-### Phase 3 — Architecture foundation (current)
-- Standardize top-level repository structure.
-- Publish architecture-oriented documentation set.
-- Establish component directories with explicit intent.
+**Outcome:** the academic problem, project boundary, and success criteria are unambiguous.
 
-### Phase 4 — Interface and contract definition
-- Define component interaction contracts.
-- Specify operational data and control boundaries.
-- Introduce traceability expectations for security and operations.
+- [x] define Project Synapse as the graduation project;
+- [x] separate Project Synapse from SOCRoot's commercial identity;
+- [x] publish safety and maturity boundaries;
+- [x] define the public/private repository map.
 
-### Phase 5 — Initial implementation tracks
-- Deliver minimal viable implementations per component track.
-- Validate boundaries under practical integration scenarios.
-- Capture operational and security feedback loops.
+**Gate:** README and documentation agree on purpose, ownership, and claim limits.
 
-### Phase 6 — Hardening and governance alignment
-- Strengthen reliability and operational controls.
-- Improve auditability and governance reporting alignment.
-- Prepare for higher-assurance release planning.
+## Phase 2 — architecture and contracts
 
-## Current state and near-term priorities
+**Outcome:** a reviewer can trace the intended data and decision paths.
 
-Current state: **Phase 3 in progress/completion transition**.
+- [x] document the logical architecture and scale-out stages;
+- [ ] publish the component/version inventory;
+- [ ] define the normalized event schema;
+- [ ] define finding, case, evidence, and approval contracts;
+- [ ] record component rationale and alternatives.
 
-Immediate next priorities:
+**Gate:** every integration edge has an owner, schema, failure behavior, and evidence requirement.
 
-1. define explicit inter-component contracts,
-2. formalize component-level engineering standards,
-3. begin controlled implementation with phase-aligned scope.
+## Phase 3 — reproducible POC
 
-## Delivery guidance
+**Outcome:** a new reviewer can run the constrained environment using synthetic data.
 
-- Progress should be evidence-based, not claim-based.
-- Architecture updates must precede major implementation divergence.
-- Security and operational constraints should be tracked as core acceptance criteria.
+- [ ] document prerequisites and setup;
+- [ ] provide sanitized configuration examples;
+- [ ] generate deterministic synthetic telemetry;
+- [ ] validate ingestion, storage, search, and observability;
+- [ ] retain expected and actual outputs.
+
+**Gate:** setup succeeds from a clean environment and produces the documented baseline.
+
+## Phase 4 — analytics evidence
+
+**Outcome:** at least one security analysis is reproducible and explainable.
+
+- [ ] define dataset scope, fields, exclusions, and quality checks;
+- [ ] implement descriptive baseline analysis;
+- [ ] evaluate a rule, statistical method, or ML method against a documented baseline;
+- [ ] record false positives, false negatives, uncertainty, and limitations;
+- [ ] link every conclusion to a versioned artifact.
+
+**Gate:** another reviewer can reproduce the result from the documented input and method.
+
+## Phase 5 — end-to-end security workflow
+
+**Outcome:** one authorized synthetic alert moves through the complete controlled path.
+
+- [ ] ingest and correlate the alert;
+- [ ] generate a finding with evidence;
+- [ ] enrich and open or update a case;
+- [ ] require human approval for a sensitive action;
+- [ ] execute dry-run or an explicitly approved lab action;
+- [ ] retain audit, outcome, and rollback evidence;
+- [ ] pass protected-target and approval-bypass negative tests.
+
+**Gate:** all acceptance criteria pass repeatedly without unsafe side effects.
+
+## Phase 6 — scalability and resilience
+
+**Outcome:** the project can explain, with measurements, what must change beyond the POC.
+
+- [ ] establish CPU, memory, storage, throughput, and latency baselines;
+- [ ] test burst handling, retry, idempotency, and back-pressure;
+- [ ] run connector-failure and recovery exercises;
+- [ ] test backup, restore, and rollback;
+- [ ] document bottlenecks and the distributed deployment plan.
+
+**Gate:** scale and reliability claims cite retained measurements and known constraints.
+
+## Phase 7 — graduation delivery package
+
+**Outcome:** the project is reviewable as an academic and engineering artifact.
+
+- [ ] architecture and data-flow diagrams;
+- [ ] component and decision inventory;
+- [ ] setup and verification guide;
+- [ ] analytics artifact and interpretation;
+- [ ] end-to-end demonstration evidence;
+- [ ] limitations, ethics, privacy, and responsible-use statement;
+- [ ] presentation narrative and demo fallback plan.
+
+**Gate:** every major claim maps to a document, test, measurement, or clearly labeled future-work item.
+
+## Immediate priorities
+
+1. publish the component/version inventory and event schema;
+2. define one deterministic synthetic end-to-end scenario;
+3. create the first reproducible data-analysis artifact;
+4. capture baseline performance and failure measurements;
+5. assemble an evidence index for the graduation review.
