@@ -90,4 +90,5 @@ Project Synapse and SOCRoot may reuse patterns or components, but:
 
 - [Overview](docs/overview.md)
 - [Architecture](docs/architecture.md)
+- [Data analytics method](docs/data-analytics.md)
 - [Roadmap](docs/roadmap.md)
