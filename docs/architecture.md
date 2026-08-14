@@ -1,117 +1,123 @@
 # Project Synapse Architecture
 
-## Architectural intent
+## Architecture thesis
 
-Project Synapse uses a modular, event-oriented architecture so that ingestion, storage, analytics, detection, case handling, response, and evidence can evolve independently. The design supports a small proof of concept first and makes the scale-out path explicit instead of assuming distributed scale from the beginning.
+Project Synapse treats security operations as a distributed data-pipeline problem. Instead of waiting for all events to be stored before analysis, the design prioritizes **stream → detect → store**. Durable streams preserve replay and audit capability while specialized consumers scale independently.
 
-## Logical data path
+## Enterprise layers
+
+| Layer | Responsibility | Candidate components |
+|---|---|---|
+| Data collection | endpoint, network, and authorized cloud telemetry | Wazuh agents, Snort/Suricata, API collectors |
+| Streaming | durable buffering, replay, partitioning, replication | Kafka |
+| Detection | explainable rules and stateful behavioral logic | Wazuh, Sigma, Spark Structured Streaming |
+| Storage | indexed alerts, enriched evidence, lifecycle tiers | OpenSearch, object storage |
+| SOAR | cases, enrichment, bounded response | TheHive, Cortex, Shuffle or reviewed alternative |
+| Operations | metrics, traces, logs, secrets, deployment | Prometheus, Grafana, Loki, OpenTelemetry, Vault |
+
+## PSM proof-of-concept path
+
+```mermaid
+sequenceDiagram
+    participant S as Synthetic/Linux auth log
+    participant K1 as Kafka raw/test topic
+    participant SP as Spark Structured Streaming
+    participant K2 as Kafka alerts topic
+    participant L as Logstash
+    participant O as OpenSearch
+    participant D as Dashboard / reviewer
+
+    S->>K1: publish authorized test event
+    K1->>SP: consume micro-batch
+    SP->>SP: rule or stateful-window evaluation
+    SP->>K2: publish enriched alert
+    K2->>L: consume alert
+    L->>O: normalize and index
+    O->>D: searchable alert and evidence
+```
+
+The current report describes a roughly 10-second Spark micro-batch and an average end-to-end latency of about 16 seconds. This is a POC characteristic, not the enterprise target.
+
+## Detection paths
+
+### Rule-based path
+
+Wazuh and Sigma provide explainable coverage for known patterns. Rule artifacts should remain readable, versioned, testable, and mapped to their input fields and expected output.
+
+### Stateful analytics path
+
+Spark supports time windows, grouping, watermarks, and checkpoints. The PSM report uses this for:
+
+- a direct `sudo` shell-execution rule;
+- a spike rule with a 10-second tumbling window, one-second slide, 30-second watermark, and threshold of five events.
+
+### ML path
+
+TensorFlow, PyTorch, Spark MLlib, or other ML tools are architectural options, not current proof. A model becomes part of the validated project only after dataset quality, leakage, baseline, metrics, inference path, drift, and feedback behavior are documented.
+
+## Controlled CVE lab path
 
 ```mermaid
 flowchart LR
-    A["Authorized or synthetic telemetry"] --> B["Ingestion and normalization"]
-    B --> C["Durable transport / buffering"]
-    C --> D["Searchable security store"]
-    C --> E["Analytics pipeline"]
-    D --> F["Rule-based detection"]
-    E --> G["Statistical or ML findings"]
-    F --> H["Triage and enrichment"]
-    G --> H
-    H --> I["Case management"]
-    I --> J["Human approval gate"]
-    J --> K["Dry-run or approved action"]
-    K --> L["Evidence, audit, and rollback record"]
-    M["Observability"] -. monitors .-> B
-    M -. monitors .-> C
-    M -. monitors .-> E
-    M -. monitors .-> I
-    M -. monitors .-> K
+    A["Select authorized CVE"] --> B["Initialize isolated lab"]
+    B --> C["Capture baseline"]
+    C --> D["Execute controlled exploit"]
+    D --> E["Observe detection and evidence"]
+    E --> F["Apply patch or mitigation"]
+    F --> G["Repeat test"]
+    G --> H{"Exploit blocked?"}
+    H -- No --> F
+    H -- Yes --> I["Seal evidence and report"]
 ```
 
-## Responsibility boundaries
+The development plan defines CLI verbs for `status`, `list`, `init`, `exploit`, `patch apply`, `verify`, `evidence`, and `report`. They remain planned or partially implemented until command-level tests and evidence are published.
 
-| Boundary | Responsibility | Candidate open-source components | Required contract |
-|---|---|---|---|
-| Ingestion | receive, validate, timestamp, and normalize events | Wazuh, collectors, webhooks | versioned event schema |
-| Transport | decouple producers and consumers; absorb bursts | Kafka or equivalent | topic ownership, retention, delivery semantics |
-| Search and storage | retain searchable security records | OpenSearch | index mapping, retention, tenant boundary |
-| Analytics | compute trends, anomalies, features, and evaluation metrics | Python, Spark, notebooks | dataset version, transformation lineage |
-| Detection | produce rule or model findings | Wazuh rules, analytics jobs | severity, confidence, evidence reference |
-| Triage and cases | enrich, prioritize, assign, and record decisions | TheHive, Cortex, custom services | case state machine and correlation ID |
-| Response | propose or execute a bounded action | SOAR/n8n/custom playbooks | authorization, dry-run, HITL, rollback |
-| Evidence | preserve inputs, decisions, outputs, and limitations | EvidenceStore/audit store | immutable identifier and provenance |
-| Observability | measure health, latency, errors, and resource use | Prometheus, Grafana, OpenTelemetry, Jaeger | metric names, trace context, alert thresholds |
+## POC-to-enterprise evolution
 
-Components are candidates until their integration is demonstrated. The project evaluates boundaries and evidence, not the popularity of a tool.
+| Concern | Single-node PSM | Enterprise design |
+|---|---|---|
+| Deployment | Docker Compose on one VM | multi-node, multi-datacenter orchestration |
+| Kafka | constrained broker/topology | partitioned and replicated clusters |
+| Spark | local/limited workers | multiple executors and isolated jobs |
+| OpenSearch | single constrained deployment | sharded, replicated hot/warm/cold tiers |
+| Availability | single point of failure | fault tolerance and recovery |
+| Throughput | about 1,000 events/second reported | 50,000–200,000 events/second design target |
+| Threat coverage | two POC rules | broader rule, behavior, and model portfolio |
+| Evidence | academic report and private runtime | reproducible public package pending |
 
-## Control planes
+No row in the enterprise column is a current deployment claim.
 
-The architecture separates three types of control:
+## Contract baseline
 
-- **data plane** — security events, normalized records, analytics inputs, findings, and cases;
-- **decision plane** — rules, model output, triage decisions, approval, and response policy;
-- **management plane** — configuration, identity, secrets, observability, deployment, and evidence retention.
-
-This prevents a detection result from automatically becoming a destructive action.
-
-## Event contract baseline
-
-Every normalized event should include, at minimum:
+Every normalized event should preserve:
 
 - `event_id`, `schema_version`, and `observed_at`;
 - source type and sanitized source identifier;
-- authorization/scope reference;
-- event category, severity, and raw-evidence reference;
-- correlation or trace identifier;
-- tenant or lab boundary where applicable;
+- authorization and scope reference;
+- category, severity, and evidence reference;
+- correlation/trace identifier;
+- lab or tenant boundary;
 - processing status and error context.
 
-Analytics and detections must reference the input dataset or event identifiers used to produce their result.
+Every finding should add rule/model version, confidence or threshold, matched evidence, and limitations.
 
-## Deployment evolution
+## Safety invariants
 
-### Stage A — constrained POC
+1. sensitive actions are dry-run-first and human-approved;
+2. CDN and RFC1918 targets are not automatically blocked;
+3. DNS-derived indicators remain notify-only;
+4. provider or connector failure fails closed;
+5. raw operational data stays out of external AI services;
+6. exploitation is limited to isolated, authorized laboratories;
+7. every experiment and approved action retains evidence and rollback context.
 
-- single host or small Docker Compose environment;
-- synthetic or lab telemetry only;
-- low-volume transport and storage;
-- manual review of every sensitive action;
-- baseline CPU, memory, storage, and latency measurements.
+## Architecture verification checklist
 
-### Stage B — separated services
-
-- independent ingestion, analytics, case, and evidence services;
-- explicit queues and retry behavior;
-- centralized secrets and observability;
-- repeatable backup, restore, and failure exercises.
-
-### Stage C — distributed validation
-
-- partitioning by workload or authorized tenant;
-- horizontal consumers and storage scaling;
-- idempotent processing and replay;
-- measured back-pressure, failover, and recovery;
-- capacity conclusions tied to retained test data.
-
-Moving between stages requires evidence; it is not implied by the architecture diagram.
-
-## Reliability and safety invariants
-
-1. `SOAR_DRY_RUN=true` is the default.
-2. Sensitive actions require explicit human approval.
-3. CDN and RFC1918 addresses are never automatically blocked.
-4. DNS-derived events are `NOTIFY_ONLY`, never `BLOCK_IP`.
-5. Raw operational data is not sent to external AI providers.
-6. Connector or model failure fails closed and cannot bypass approval.
-7. Every approved action retains input, decision, outcome, and rollback evidence.
-8. Duplicate events and retries must be idempotent.
-
-## Architecture evidence checklist
-
-- [ ] current component and version inventory
-- [ ] versioned event and case contracts
-- [ ] updated logical and deployment diagrams
-- [ ] one reproducible end-to-end integration
-- [ ] negative tests for protected targets and approval bypass
-- [ ] baseline latency, throughput, resource, and failure measurements
-- [ ] backup, restore, and rollback exercise
-- [ ] documented limitations and unresolved decisions
+- [ ] publish component and version inventory
+- [ ] publish versioned event, finding, case, and evidence schemas
+- [ ] reproduce the PSM path from a clean environment
+- [ ] publish sanitized fixtures and expected outputs
+- [ ] rerun benchmark methodology and retain machine-readable results
+- [ ] test protected-target and approval-bypass failures
+- [ ] document backup, restore, replay, and rollback
+- [ ] label every diagram element as implemented, integrated, measured, or planned
