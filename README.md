@@ -1,61 +1,93 @@
 # Project Synapse
 
-**Project Synapse is the public architecture and documentation foundation behind SOCRoot.**
+**Project Synapse is my cybersecurity graduation project.**
 
-It began as a graduation project exploring how smaller organizations could access practical SOC capabilities without the cost and complexity of a traditional enterprise SOC. The work has since evolved into SOCRoot, while this repository remains the public source for architecture, scope, maturity, and engineering decisions.
+It explores how an open-source security stack can be combined with data analytics in a modular engineering architecture that can grow from a constrained prototype into a larger distributed deployment.
 
-## Problem statement
+Project Synapse is **not SOCRoot** and it is not evaluated as a subscription business. Its success criteria are technical and academic: clear architecture, correct integration, reproducible evidence, explainable analysis, measured constraints, and a documented path to scale.
 
-Small and medium-sized organizations often need monitoring, detection, incident handling, and security reporting, but cannot operate a full enterprise SOC. Project Synapse documents a modular path toward those capabilities while keeping safety, cost, privacy, and operational realism as first-class constraints.
+## Engineering objective
+
+Build and document a hybrid SOC architecture that:
+
+- uses reviewable, self-hostable, open-source components where practical;
+- combines rule-based detection with data analysis and, where justified, statistical or ML techniques;
+- makes the path from ingestion to storage, enrichment, detection, case handling, response, and evidence explicit;
+- separates components through documented contracts so they can be replaced or scaled independently;
+- supports a small single-node proof of concept and explains how the same boundaries can scale horizontally;
+- records operational evidence, limitations, failure modes, and rollback behavior.
+
+## Architectural principles
+
+1. **Open-source first** — favor components that can be inspected, documented, and self-hosted.
+2. **Hybrid analytics** — combine rules, enrichment, data analysis, and ML only where data and evidence support them.
+3. **Modularity** — separate ingestion, storage, analytics, detection, case management, and response.
+4. **Scalability** — design a clear path from Synapse Mini to a distributed deployment.
+5. **Observability** — measure data flow, latency, errors, resource use, and component health.
+6. **Governance and safety** — keep permissions, evidence, approval boundaries, and rollback explicit.
+
+## Documented component set
+
+The current material discusses components such as:
+
+- Wazuh for SIEM/XDR telemetry and rule-based detection;
+- Kafka or equivalent messaging for decoupled data flow;
+- OpenSearch for indexing, search, and dashboards;
+- Spark/ML or other data-analysis paths where justified;
+- TheHive/Cortex for case management and enrichment;
+- Docker for reproducible deployment;
+- Prometheus, Grafana, OpenTelemetry, and Jaeger for observability.
+
+A component appearing in a diagram does not prove that every integration works end to end. Operational claims require a reproducible test and retained evidence.
 
 ## Repository role
 
-This repository contains **architecture and documentation**, not the canonical runtime implementation.
+This repository is the public source for the graduation project's scope, architecture, maturity, and evidence gates.
 
-| Concern | Canonical repository |
+| Concern | Canonical location |
 |---|---|
-| Public architecture and roadmap | This repository |
-| Control plane, portals, RBAC, and evidence workflows | `ide-agentic-engine` — private during Git-history security review |
-| Alert ingestion, triage, orchestration, and runtime actions | `Project-Synapse-SOC-Factory` — private during Git-history security review |
-| Product website | [kyriesoc](https://github.com/Muath-Yousef/kyriesoc) |
+| Public architecture, data flow, decisions, and roadmap | This repository |
+| Runtime/POC for ingestion, triage, HITL, and evidence capture | `Project-Synapse-SOC-Factory` — private during Git-history review |
+| Commercial cybersecurity service direction | [SOCRoot](https://socroot.com) — a separate project |
+| SOCRoot public website | [kyriesoc](https://github.com/Muath-Yousef/kyriesoc) |
 
-## Architectural scope
+## Graduation-project completion criteria
 
-The target architecture brings together:
-
-- SIEM/XDR monitoring with Wazuh
-- SOAR workflows with Shuffle
-- Case management with TheHive
-- Evidence capture and security reporting
-- Python and Docker-based services
-- PostgreSQL, Redis, and OpenSearch
-- Prometheus, Grafana, OpenTelemetry, and Jaeger
-- AI-assisted analysis with privacy and safety boundaries
-- Compliance-oriented knowledge for Jordan and UAE use cases
+- an updated architecture diagram with explicit boundaries and contracts;
+- a component inventory with role, rationale, and alternatives;
+- a documented data path from ingestion through analysis, detection, and case handling;
+- at least one end-to-end integration test with an input, expected output, and acceptance criteria;
+- baseline measurements for latency, data volume, resource consumption, and failures;
+- a documented path from a constrained POC to a distributed deployment;
+- a delivery package covering setup, verification, limitations, and rollback.
 
 ## Safety invariants
 
-These rules are architectural requirements:
-
-1. SOAR_DRY_RUN=true by default.
+1. `SOAR_DRY_RUN=true` by default.
 2. Sensitive actions require human approval.
 3. CDN and RFC1918 addresses are never automatically blocked.
-4. DNS events produce NOTIFY_ONLY, never BLOCK_IP.
+4. DNS events produce `NOTIFY_ONLY`, never `BLOCK_IP`.
 5. Raw client data is never sent to external AI providers.
 6. Every action must produce traceable evidence and support rollback.
 
 ## Maturity
 
-**Status: active architecture and pre-production validation.**
+**Status: active graduation-project architecture and prototype validation.**
 
-The project demonstrates substantial engineering work, but it does not claim complete end-to-end production readiness, a proven SLA, or fully autonomous remediation. Each capability should be treated as verified only when backed by tests, deployment evidence, and a documented rollback path.
+The project does not claim full end-to-end production readiness, a proven SLA, autonomous remediation, sovereign or national-grade capability, or performance figures that are not backed by reviewable tests.
+
+## Relationship with SOCRoot
+
+[SOCRoot](https://socroot.com) is a separate commercial innovation focused on subscription-based, automatable cybersecurity services with measurable customer value.
+
+Project Synapse and SOCRoot may reuse patterns or components, but:
+
+- technical evidence from Project Synapse does not prove that a customer will pay for SOCRoot;
+- a SOCRoot subscription does not by itself validate the Project Synapse academic deliverable;
+- shared code does not merge their scope, ownership, or success criteria.
 
 ## Documentation
 
 - [Overview](docs/overview.md)
 - [Architecture](docs/architecture.md)
 - [Roadmap](docs/roadmap.md)
-
-## Intended outcome
-
-The near-term goal is not to add more architectural layers. It is to validate one narrow, safe, commercially useful workflow for an SMB, measure delivery cost and operational risk, and turn the result into a repeatable service.
