@@ -1,77 +1,121 @@
 # Project Synapse Overview
 
-## Project identity
+## Academic identity
 
-**Project Synapse is an open-source cybersecurity graduation project** by Mu'ath Yousef. It combines security-operations tooling, data analytics, and a modular engineering architecture designed to evolve from a constrained proof of concept into a scalable distributed system.
+Project Synapse is Mu'ath Yousef's 2025–2026 graduation project at Tafila Technical University. Its academic deliverable is titled **“Project Synapse: AI-Driven Hybrid SOC Platform — From Enterprise Vision to Proof-of-Concept Implementation.”**
 
-Project Synapse is independent from SOCRoot. Its primary success criteria are academic and technical: a clear problem statement, defensible architecture decisions, reproducible implementation evidence, explainable analysis, measured constraints, and an honest maturity assessment.
+The project investigates whether an open-source, stream-processing architecture can provide explainable, scalable security detection while reducing dependence on expensive, opaque commercial SIEM platforms.
 
-## Problem statement
+## Contribution model
 
-Security-operations prototypes often fail for three reasons:
+Project Synapse has three related but separately evaluated contributions.
 
-1. tools are assembled without explicit data or control contracts;
-2. analytics are presented without a reproducible path from source data to conclusion;
-3. architecture diagrams imply scale or production readiness that has not been tested.
+### 1. Enterprise architecture
 
-Project Synapse addresses those gaps by documenting the complete path from authorized telemetry ingestion to analysis, detection, triage, controlled response, and retained evidence.
+A six-layer design covering:
 
-## Research and engineering question
+1. data collection;
+2. durable event streaming;
+3. rule-based and behavioral detection;
+4. searchable evidence storage;
+5. case management and SOAR;
+6. observability and secrets management.
 
-> How can an open-source, hybrid security stack combine rule-based detection and data analysis in a modular architecture that is practical for a small proof of concept and has a documented path to scale?
+The design target is a distributed, multi-datacenter deployment. It is an architecture and capacity model, not evidence that a 90-node system is currently deployed.
 
-The project evaluates that question through architecture decisions, integration tests, measurements, and limitations—not through unsupported production or commercial claims.
+### 2. PSM proof of concept
 
-## Scope
+PSM (Proactive Security Monitoring) is a deliberately constrained, single-node implementation. It validates the most important architectural assumption: security events can move through Kafka, Spark detection, Kafka alerts, Logstash, and OpenSearch with measurable behavior.
 
-### In scope
+PSM removes high availability, replication, geographic distribution, and broad threat coverage. Its role is experimental validation, not production equivalence.
 
-- authorized and synthetic security telemetry;
-- ingestion, normalization, storage, enrichment, and search;
-- rule-based detections and evidence-backed analytics;
-- case handling and human-in-the-loop response boundaries;
-- observability for data flow, errors, latency, and resource use;
-- reproducible local deployment and a documented scale-out model;
-- documentation of assumptions, alternatives, limitations, and rollback.
+### 3. Controlled CVE lab workflow
 
-### Out of scope until separately proven
+The graduation-development plan also defines Synapse Arm / CLI for authorized lab work:
 
-- unattended production remediation;
-- guaranteed SLAs, compliance, or certification;
-- production-scale performance numbers without retained test evidence;
-- use of real client data in public fixtures or external AI services;
-- claims that Project Synapse validates SOCRoot's market demand.
+- initialize a CVE environment;
+- reproduce exploitation under controlled conditions;
+- observe detection;
+- apply a patch or mitigation;
+- verify the exploit no longer succeeds;
+- preserve evidence and generate a report.
 
-## Workstreams
+This is a planned graduation workflow whose implementation evidence must be tracked separately from the PSM benchmark.
 
-| Workstream | Core question | Expected evidence |
-|---|---|---|
-| Architecture | Are responsibilities and interfaces explicit? | diagrams, contracts, decision records |
-| Open-source integration | Can selected components exchange data reliably? | configuration, synthetic fixtures, integration logs |
-| Data analytics | Can analysis be reproduced and explained? | dataset definition, notebook/query, metrics, limitations |
-| Security operations | Can an alert move safely through triage and review? | end-to-end scenario, decision record, rollback |
-| Scalability | What changes between a small POC and distributed deployment? | baseline measurements, bottlenecks, scale-out plan |
-| Governance | Are scope, authorization, privacy, and maturity visible? | safety policy, evidence inventory, claim register |
+## Research question
 
-## Expected deliverables
+> Can a hybrid open-source SOC architecture combine explainable rules and stateful stream analytics, prove its core design on constrained infrastructure, and retain a credible path toward horizontal scale?
 
-1. architecture and data-flow documentation;
-2. component inventory with rationale and alternatives;
-3. reproducible setup for a constrained POC;
-4. at least one end-to-end synthetic integration scenario;
-5. a data-analysis artifact with method, result, and caveats;
-6. baseline resource and latency measurements;
-7. limitations, failure modes, recovery, and future-work record.
+## Hybrid detection
 
-## Repository boundaries
+The architecture combines:
 
-- This public repository owns the scope, architecture, analytics method, maturity, and evidence gates.
-- The private `Project-Synapse-SOC-Factory` repository contains the runtime/POC while Git-history and release-safety review continue.
-- Reusable utilities may live in `security-tools`.
-- [SOCRoot](https://socroot.com) is a separate commercial initiative with different success criteria.
+- **signature and rule-based detection** using Wazuh and Sigma for explainable known patterns;
+- **behavioral detection** using Spark Structured Streaming for windows, aggregation, sequences, and contextual enrichment;
+- **future ML integration** only after appropriate data, labels, baselines, and feedback loops exist.
 
-## Current maturity
+The current PSM report documents two privilege-escalation rules:
 
-**Active architecture and prototype validation.**
+- `SUDO_SHELL_EXECUTION` — matches suspicious sudo shell execution;
+- `SUDO_ABUSE_SPIKE` — detects five or more sudo events within a stateful time window.
 
-The documented design is more mature than the retained public implementation evidence. Each capability should therefore be labeled as designed, implemented, integrated, measured, or production-validated; a diagram or dependency alone is never counted as proof.
+## Reported PSM results
+
+The academic report records:
+
+- 60,000 events processed in 62 seconds;
+- 967 events/second sustained and 1,200 events/second peak;
+- 15.96-second average latency, 17.8-second P95, and 18.2-second P99;
+- 95.9% precision, 94.0% recall, and 94.9% F1 on 100 labeled cases;
+- 2,847,391 events in a seven-day simulation with 1,247 alerts.
+
+These are source-backed results from the academic deliverable. They are not yet a public, independently rerunnable benchmark. The [evidence register](evidence-register.md) records that distinction.
+
+## Scope boundaries
+
+### Demonstrated or reported
+
+- Kafka → Spark → Kafka → Logstash → OpenSearch POC path;
+- stateful privilege-escalation detection;
+- controlled accuracy and throughput measurements;
+- architecture and capacity-planning model;
+- Docker Compose proof-of-concept approach.
+
+### Designed or planned
+
+- enterprise-scale 50,000–200,000 events/second;
+- multi-node and multi-datacenter deployment;
+- TheHive/Cortex/Shuffle SOAR integration;
+- expanded detection rules;
+- ML models and analyst-feedback loops;
+- complete Synapse Arm / CLI CVE lifecycle.
+
+### Explicitly not claimed
+
+- live production-scale deployment;
+- guaranteed SLA or certification;
+- complete autonomous response;
+- broad threat coverage from two POC rules;
+- commercial validation for SOCRoot.
+
+## Success criteria
+
+The graduation project is strong when a reviewer can:
+
+1. understand the problem and design trade-offs;
+2. trace data and decisions across components;
+3. reproduce at least one POC scenario from sanitized inputs;
+4. inspect accuracy and performance methodology;
+5. distinguish measured POC results from enterprise targets;
+6. review limitations, safety controls, and future work.
+
+## Source hierarchy
+
+Internally, the current source hierarchy is:
+
+1. White Paper v2.0 — concept and enterprise architecture;
+2. the 2025–2026 academic report — graduation delivery, methods, results, cost model, and appendices;
+3. development plans — dashboard, backend, Synapse CLI, POC packaging, and future work;
+4. GitHub — public, sanitized, reviewable documentation and code.
+
+Original source files remain in Google Drive; GitHub publishes only the safe engineering narrative and evidence boundary.
